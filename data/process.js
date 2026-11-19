@@ -1,5 +1,6 @@
 // Process definition. Edit this file to adapt the roadmap to a new integration.
 // NODES must be listed so that every step appears after the steps it depends on.
+(function () {
 const TEAMS = {
   'PM':    { n: 'Product Manager', c: 'var(--t-pm)' },
   'ENG-PY':{ n: 'Python specialist', c: 'var(--t-py)' },
@@ -72,3 +73,4 @@ const PHASE = { 0:'Intake',1:'Define',2:'Plan',3:'Gate',4:'Build',5:'Verify',6:'
 
 
 window.PROCESS = { TEAMS, NODES, ASSETS, PHASE };
+})();
