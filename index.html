@@ -1,0 +1,392 @@
+<title>SSDLC Integration Roadmap</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Code+Pro:wght@400;600&display=swap">
+<style>
+/* Layout: a top-to-bottom process map (one row per dependency level), then a week-scaled schedule, then an asset table. */
+:root {
+  --bg: #f8faf9;
+  --surface: #ffffff;
+  --ink: #001e2b;
+  --ink-2: #3d4f58;
+  --ink-3: #6b7c85;
+  --line: #d9e1e4;
+  --accent: #00684a;
+  --accent-soft: #e3f4ec;
+  --edge: #aab8bf;
+  --warn: #9a5b00;
+  --t-pm: #2b6cb0;
+  --t-py: #b7791f;
+  --t-ts: #0e7490;
+  --t-mgr: #6b46c1;
+  --t-mkt: #c2410c;
+  --t-gtm: #be185d;
+  --t-pa: #4d7c0f;
+  --t-br: #64748b;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Source Code Pro", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #001e2b; --surface: #0b2a38; --ink: #e8efe9; --ink-2: #b4c3c9; --ink-3: #8499a3;
+    --line: #1f4050; --accent: #00ed64; --accent-soft: #08382f; --edge: #3f6272; --warn: #f0b24a;
+    --t-pm: #6aa7f0; --t-py: #e3b341; --t-ts: #4cc9e0; --t-mgr: #a78bfa; --t-mkt: #fb923c; --t-gtm: #f472b6; --t-pa: #a3d65c; --t-br: #94a3b8;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #001e2b; --surface: #0b2a38; --ink: #e8efe9; --ink-2: #b4c3c9; --ink-3: #8499a3;
+  --line: #1f4050; --accent: #00ed64; --accent-soft: #08382f; --edge: #3f6272; --warn: #f0b24a;
+  --t-pm: #6aa7f0; --t-py: #e3b341; --t-ts: #4cc9e0; --t-mgr: #a78bfa; --t-mkt: #fb923c; --t-gtm: #f472b6; --t-pa: #a3d65c; --t-br: #94a3b8;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 32px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 40px; }
+h1 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0 0 8px; letter-spacing: -0.02em; text-wrap: balance; }
+h2 { font-size: 20px; margin: 0 0 4px; letter-spacing: -0.01em; text-wrap: balance; }
+.lead { color: var(--ink-2); max-width: 66ch; margin: 0; }
+.sub { color: var(--ink-3); margin: 0 0 16px; max-width: 70ch; font-size: 14px; }
+.mono { font-family: var(--mono); }
+.eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); font-weight: 600; margin-bottom: 8px; }
+
+/* key dates */
+.dates { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 24px; }
+.date { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; min-width: 0; }
+.date .k { font-family: var(--mono); font-weight: 600; color: var(--accent); font-size: 14px; }
+.date .v { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; margin: 2px 0; }
+.date .d { font-size: 12.5px; color: var(--ink-3); line-height: 1.4; }
+.controls { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: end; margin-top: 20px; }
+.controls label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; }
+.controls .check { flex-direction: row; align-items: center; gap: 8px; text-transform: none; letter-spacing: 0; font-size: 14px; color: var(--ink); padding-bottom: 8px; }
+input[type=date], input[type=number] { font: inherit; font-size: 14px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
+input[type=number] { width: 72px; }
+.total { padding-bottom: 8px; font-size: 14px; color: var(--ink-2); }
+.total b { color: var(--ink); font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* team chips */
+.teams { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 13px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px 4px 8px; cursor: pointer; }
+.chip[aria-pressed=true] { border-color: var(--ink); background: var(--accent-soft); }
+.chip .dot, .tag .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c); flex: none; }
+.chip .nm { color: var(--ink-3); }
+.tag { display: inline-flex; align-items: center; gap: 4px; font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--ink-2); }
+
+/* process map */
+.scroller { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.map { position: relative; min-width: 940px; padding: 20px 20px 24px 120px; display: flex; flex-direction: column; gap: 28px; }
+.map svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: visible; }
+.row { position: relative; z-index: 1; display: flex; justify-content: center; gap: 16px; }
+.phase { position: absolute; left: -100px; top: 0; width: 88px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-3); line-height: 1.3; }
+.node { width: 212px; text-align: left; font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 9px 11px 10px; cursor: pointer; display: flex; flex-direction: column; gap: 6px; transition: opacity .15s; }
+.node:hover { border-color: var(--ink-3); }
+.node .top { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.node .id { font-family: var(--mono); font-size: 11px; color: var(--ink-3); font-weight: 600; }
+.node .nm { font-weight: 600; font-size: 13.5px; line-height: 1.3; }
+.node .tags { display: flex; flex-wrap: wrap; gap: 4px 8px; }
+.node .meta { font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.badge { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 1px 6px; border-radius: 3px; background: var(--accent-soft); color: var(--accent); }
+.badge.opt { background: transparent; border: 1px dashed var(--ink-3); color: var(--ink-3); }
+.node.crit { border-left: 3px solid var(--accent); }
+.node.sel { border-color: var(--ink); box-shadow: 0 0 0 2px var(--ink); }
+.node.rel { border-color: var(--accent); }
+.node.dim { opacity: .35; }
+.node.skip { border-style: dashed; }
+.node.skip .nm { text-decoration: line-through; color: var(--ink-3); }
+.edge { fill: none; stroke: var(--edge); stroke-width: 1.4; }
+.edge.hot { stroke: var(--accent); stroke-width: 2.4; }
+.edge.dim { opacity: .15; }
+.edge.rel { stroke: var(--ink); opacity: .85; }
+.arrow { fill: var(--edge); } .arrow.hot { fill: var(--accent); }
+.key { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 12.5px; color: var(--ink-3); margin-top: 10px; }
+.key i { display: inline-block; width: 22px; height: 0; border-top: 2.4px solid var(--accent); vertical-align: middle; margin-right: 6px; }
+.key i.n { border-top: 1.4px solid var(--edge); }
+
+/* detail */
+.detail { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; margin-top: 16px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px 32px; }
+.detail h3 { margin: 0; font-size: 18px; }
+.detail h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-3); }
+.detail ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 3px; }
+.detail .sec { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.fact .k { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
+.fact .v { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 14px; }
+.links { display: flex; flex-wrap: wrap; gap: 6px; }
+.link { font-family: var(--mono); font-size: 12px; font-weight: 600; background: var(--bg); border: 1px solid var(--line); color: var(--ink); border-radius: 4px; padding: 2px 8px; cursor: pointer; }
+.link:hover { border-color: var(--accent); }
+.none { color: var(--ink-3); font-size: 14px; }
+.note { font-size: 13.5px; color: var(--ink-2); }
+
+/* gantt */
+.gantt { min-width: 780px; padding: 8px 16px 16px; --lw: 230px; }
+.g-head, .g-row { display: grid; grid-template-columns: var(--lw) minmax(0, 1fr); align-items: center; }
+.g-head { height: 76px; border-bottom: 1px solid var(--line); }
+.g-body { position: relative; }
+.g-track { position: relative; height: 100%; }
+.g-row { height: 30px; border-bottom: 1px solid color-mix(in srgb, var(--line) 55%, transparent); transition: opacity .15s; }
+.g-row.dim { opacity: .3; }
+.g-row.sel .g-lab { font-weight: 700; }
+.g-lab { font-size: 13px; padding-right: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; background: none; border: 0; text-align: left; font-family: inherit; color: var(--ink); }
+.g-lab .mono { color: var(--ink-3); font-size: 11px; margin-right: 6px; }
+.bar { position: absolute; top: 6px; height: 18px; border-radius: 3px; background: var(--c); display: flex; align-items: center; padding: 0 6px; color: #fff; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; overflow: hidden; white-space: nowrap; cursor: pointer; border: 0; font-family: inherit; }
+:root[data-theme="dark"] .bar { color: #001e2b; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .bar { color: #001e2b; } }
+.bar.crit { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--accent); }
+.lines { position: absolute; top: 0; bottom: 0; left: var(--lw); right: 0; pointer-events: none; }
+.ln { position: absolute; top: 0; bottom: 0; border-left: 1.5px dashed var(--accent); }
+.ln span { position: absolute; top: -70px; left: 4px; font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--accent); white-space: nowrap; background: var(--surface); padding: 0 2px; }
+.ln.hi span { top: -50px; }
+.tick { position: absolute; top: 0; bottom: 0; border-left: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
+.tl { position: absolute; bottom: 4px; transform: translateX(-50%); font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* assets */
+.assets { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.asset { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.asset h3 { margin: 0; font-size: 15px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.asset h3 .mono { color: var(--accent); }
+.asset dl { margin: 0; display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 4px 8px; font-size: 13px; }
+.asset dt { color: var(--ink-3); } .asset dd { margin: 0; }
+.legend-t { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 6px 20px; font-size: 13.5px; }
+.legend-t div { display: flex; gap: 8px; align-items: center; }
+.foot { font-size: 13px; color: var(--ink-3); max-width: 76ch; }
+
+@media (max-width: 760px) {
+  .dates { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .detail { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<main class="wrap">
+  <header>
+    <div class="eyebrow">Secure Software Development Lifecycle</div>
+    <h1>SSDLC Integration Roadmap</h1>
+    <p class="lead">How a product moves from product description to public launch with security built into every step. Select a step to see its features and dependencies. Change the start date or any estimate and the schedule recalculates.</p>
+
+    <div class="controls">
+      <label for="t0in">t0 (PD or SCP available)<input type="date" id="t0in" value="2026-11-23"></label>
+      <label class="check" for="desOn"><input type="checkbox" id="desOn" checked> Design (DES) is needed</label>
+      <div class="total" id="total"></div>
+    </div>
+    <div class="dates" id="dates"></div>
+  </header>
+
+  <section>
+    <h2>Process map</h2>
+    <p class="sub">Steps flow top to bottom. Steps in the same row can run in parallel. Filter by team to see where each one is involved.</p>
+    <div class="teams" id="teams" role="group" aria-label="Filter by team"></div>
+    <div class="scroller"><div class="map" id="map"></div></div>
+    <div class="key"><span><i></i>Critical path (no slack)</span><span><i class="n"></i>Dependency with slack</span><span><span class="badge opt">Optional</span> step can be skipped</span></div>
+    <div class="detail" id="detail" aria-live="polite"></div>
+  </section>
+
+  <section>
+    <h2>Schedule</h2>
+    <p class="sub">Each bar starts as soon as every dependency is done. Bars are coloured by the lead team. An outline marks the critical path.</p>
+    <div class="scroller"><div class="gantt" id="gantt"></div></div>
+  </section>
+
+  <section>
+    <h2>Assets</h2>
+    <p class="sub">Documents that move through the process, with who owns, authors and signs off each one.</p>
+    <div class="assets" id="assets"></div>
+  </section>
+
+  <section>
+    <h2>Teams</h2>
+    <div class="legend-t" id="legend"></div>
+  </section>
+
+  <p class="foot">Estimates are conservative starting values in calendar weeks. Replace them with your own as you learn them. t0 is the moment a PD or SCP exists; step S1 begins there. tStart is the end of the resourcing gate (S7), tEnd is the end of partner validation (S14), and tLaunch is the end of the launch step (S19).</p>
+</main>
+
+<script src="data/process.js"></script>
+<script>
+
+const {TEAMS, NODES, ASSETS, PHASE} = window.PROCESS;
+const byId = Object.fromEntries(NODES.map(n => [n.id, n]));
+NODES.forEach(n => n.succ = []);
+NODES.forEach(n => n.deps.forEach(d => byId[d].succ.push(n.id)));
+NODES.forEach(n => { n.level = n.deps.length ? 1 + Math.max(...n.deps.map(d => byId[d].level)) : 0; });
+
+const state = { est: Object.fromEntries(NODES.map(n => [n.id, n.est])), des: true, sel: 'S7', team: null, t0: '2026-11-23' };
+const $ = s => document.querySelector(s);
+const MS = 7 * 864e5;
+const fmt = d => d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric', timeZone:'UTC' });
+const wkDate = w => new Date(new Date(state.t0 + 'T00:00:00Z').getTime() + w * MS);
+const estOf = n => (n.optional && !state.des) ? 0 : state.est[n.id];
+const isSkipped = n => n.optional && !state.des;
+
+let S = {}; // schedule results
+function schedule() {
+  S = {};
+  NODES.forEach(n => { // array order is topological
+    const es = n.deps.length ? Math.max(...n.deps.map(d => S[d].ef)) : 0;
+    S[n.id] = { es, ef: es + estOf(n) };
+  });
+  const end = Math.max(...NODES.map(n => S[n.id].ef));
+  S.end = end;
+  [...NODES].reverse().forEach(n => {
+    const lf = n.succ.length ? Math.min(...n.succ.map(s => S[s].ls)) : end;
+    S[n.id].lf = lf; S[n.id].ls = lf - estOf(n);
+    S[n.id].slack = Math.round((lf - S[n.id].ef) * 100) / 100;
+    S[n.id].crit = S[n.id].slack === 0 && !isSkipped(n);
+  });
+}
+const mk = {
+  t0: () => 0,
+  tStart: () => S.S7.ef,
+  tEnd: () => S.S14.ef,
+  tLaunch: () => S.S19.ef
+};
+const teamTag = t => `<span class="tag" style="--c:${TEAMS[t].c}"><span class="dot"></span>${t}</span>`;
+const wk = x => (Math.round(x * 10) / 10).toString();
+
+function renderDates() {
+  const defs = {
+    t0: 'PD or SCP is available. Step S1 starts.',
+    tStart: 'Engineering begins after the resourcing gate.',
+    tEnd: 'Target date engineering ends, after partner validation.',
+    tLaunch: 'The product is announced to the world.'
+  };
+  $('#dates').innerHTML = Object.keys(mk).map(k => {
+    const w = mk[k]();
+    return `<div class="date"><div class="k">${k}</div><div class="v">${fmt(wkDate(w))}</div><div class="d">Week ${wk(w)}. ${defs[k]}</div></div>`;
+  }).join('');
+  $('#total').innerHTML = `Time to launch: <b>${wk(S.S19.ef)} weeks</b> · Engineering window: <b>${wk(S.S14.ef - S.S7.ef)} weeks</b>`;
+}
+
+function renderTeams() {
+  $('#teams').innerHTML = Object.keys(TEAMS).map(t =>
+    `<button class="chip" data-team="${t}" aria-pressed="${state.team === t}" title="${TEAMS[t].n}"><span class="dot" style="--c:${TEAMS[t].c}"></span><b class="mono" style="font-size:12px">${t}</b></button>`).join('');
+  $('#legend').innerHTML = Object.keys(TEAMS).map(t => `<div>${teamTag(t)}<span>${TEAMS[t].n}</span></div>`).join('');
+}
+
+function relatedSet() {
+  const set = new Set();
+  if (!state.sel) return set;
+  const up = id => byId[id].deps.forEach(d => { if (!set.has(d)) { set.add(d); up(d); } });
+  const down = id => byId[id].succ.forEach(d => { if (!set.has(d)) { set.add(d); down(d); } });
+  up(state.sel); down(state.sel);
+  return set;
+}
+function nodeDim(n, rel) {
+  if (state.team) return !n.teams.includes(state.team);
+  return false;
+}
+
+function renderMap() {
+  const levels = {};
+  NODES.forEach(n => (levels[n.level] = levels[n.level] || []).push(n));
+  const rel = relatedSet();
+  let lastPhase = '';
+  $('#map').innerHTML = '<svg id="svg" aria-hidden="true"><defs>' +
+    '<marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M0 0 L8 4 L0 8z"/></marker>' +
+    '<marker id="ahh" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow hot" d="M0 0 L8 4 L0 8z"/></marker>' +
+    '</defs><g id="edges"></g></svg>' +
+    Object.keys(levels).map(l => {
+      const ph = PHASE[l]; const label = ph !== lastPhase ? `<div class="phase">${ph}</div>` : ''; lastPhase = ph;
+      return `<div class="row">${label}${levels[l].map(n => {
+        const s = S[n.id];
+        const cls = ['node', s.crit ? 'crit' : '', state.sel === n.id ? 'sel' : '', (state.sel && rel.has(n.id)) ? 'rel' : '', nodeDim(n) ? 'dim' : '', isSkipped(n) ? 'skip' : ''].join(' ');
+        const meta = isSkipped(n) ? 'Skipped' : `Wk ${wk(s.es)}–${wk(s.ef)} · ${wk(estOf(n))}w`;
+        return `<button class="${cls}" data-id="${n.id}" aria-label="${n.id} ${n.name}"><div class="top"><span class="id">${n.id}</span>${n.optional ? '<span class="badge opt">Optional</span>' : (s.crit ? '<span class="badge">Critical</span>' : '')}</div><div class="nm">${n.name}</div><div class="tags">${n.teams.map(teamTag).join('')}</div><div class="meta">${meta}</div></button>`;
+      }).join('')}</div>`;
+    }).join('');
+  drawEdges();
+}
+
+function drawEdges() {
+  const map = $('#map'), g = $('#edges');
+  if (!g) return;
+  const base = map.getBoundingClientRect();
+  const rel = relatedSet();
+  let out = '';
+  NODES.forEach(n => n.deps.forEach(d => {
+    const a = map.querySelector(`[data-id="${d}"]`), b = map.querySelector(`[data-id="${n.id}"]`);
+    if (!a || !b) return;
+    const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+    const x1 = ra.left + ra.width / 2 - base.left, y1 = ra.bottom - base.top;
+    const x2 = rb.left + rb.width / 2 - base.left, y2 = rb.top - base.top - 2;
+    const dy = Math.max(24, (y2 - y1) / 2);
+    const hot = S[d].crit && S[n.id].crit && Math.abs(S[d].ef - S[n.id].es) < 1e-9;
+    let cls = 'edge';
+    if (hot) cls += ' hot';
+    if (state.sel) {
+      const inSet = (id) => id === state.sel || rel.has(id);
+      if (inSet(d) && inSet(n.id)) cls += ' rel'; else cls += ' dim';
+    }
+    if (isSkipped(byId[d]) || isSkipped(n)) cls += ' dim';
+    out += `<path class="${cls}" marker-end="url(#${hot && !state.sel ? 'ahh' : 'ah'})" d="M${x1} ${y1} C${x1} ${y1 + dy} ${x2} ${y2 - dy} ${x2} ${y2}"/>`;
+  }));
+  g.innerHTML = out;
+}
+
+function renderDetail() {
+  const n = byId[state.sel];
+  if (!n) { $('#detail').innerHTML = '<p class="none">Select a step to see its details.</p>'; return; }
+  const s = S[n.id];
+  const link = id => `<button class="link" data-goto="${id}" title="${byId[id].name}">${id}</button>`;
+  const asset = n.asset ? ASSETS.find(a => a.k === n.asset) : null;
+  $('#detail').innerHTML = `
+    <div class="sec">
+      <div><div class="eyebrow mono" style="margin:0 0 2px">${n.id} · ${n.phase}</div><h3>${n.name}</h3></div>
+      ${n.note ? `<div class="note">${n.note}</div>` : ''}
+      <div><h4>Features</h4><ul>${n.features.map(f => `<li>${f}</li>`).join('')}</ul></div>
+      ${asset ? `<div><h4>Asset</h4><div class="note"><b class="mono">${asset.k}</b> ${asset.name}. Owner ${asset.owner}. Sign-off: ${asset.sign}.</div></div>` : ''}
+    </div>
+    <div class="sec">
+      <div><h4>Teams</h4><div class="links" style="gap:8px 14px">${n.teams.map((t, i) => `<span>${teamTag(t)}${i === 0 ? ' <span class="note">lead</span>' : ''}</span>`).join('')}</div></div>
+      <div class="facts">
+        <div class="fact"><div class="k">Est (weeks)</div><div class="v"><input type="number" id="estIn" min="0" max="52" step="1" value="${state.est[n.id]}" aria-label="Estimate in weeks for ${n.id}" ${isSkipped(n) ? 'disabled' : ''}></div></div>
+        <div class="fact"><div class="k">Starts</div><div class="v">${fmt(wkDate(s.es))}</div></div>
+        <div class="fact"><div class="k">Ends</div><div class="v">${fmt(wkDate(s.ef))}</div></div>
+        <div class="fact"><div class="k">Slack</div><div class="v">${isSkipped(n) ? 'n/a' : (s.crit ? 'None, critical' : wk(s.slack) + ' weeks')}</div></div>
+      </div>
+      <div><h4>Depends on</h4>${n.deps.length ? `<div class="links">${n.deps.map(link).join('')}</div>` : '<span class="none">Nothing. This step starts at t0.</span>'}</div>
+      <div><h4>Unblocks</h4>${n.succ.length ? `<div class="links">${n.succ.map(link).join('')}</div>` : '<span class="none">Nothing. End of the process.</span>'}</div>
+    </div>`;
+  const inp = $('#estIn');
+  if (inp) inp.addEventListener('change', e => {
+    const v = Math.max(0, Math.min(52, parseFloat(e.target.value) || 0));
+    state.est[n.id] = v; update();
+  });
+}
+
+function renderGantt() {
+  const end = Math.max(S.end, 1);
+  const pct = w => (w / end * 100) + '%';
+  const rows = [...NODES].filter(n => !isSkipped(n)).sort((a, b) => S[a.id].es - S[b.id].es || a.level - b.level);
+  let ticks = '';
+  for (let w = 0; w <= end; w += 4) ticks += `<div class="tick" style="left:${pct(w)}"></div><div class="tl" style="left:${pct(w)}">${w === 0 ? '' : 'W' + w}</div>`;
+  const marks = Object.keys(mk).map((k, i) => `<div class="ln${i % 2 ? ' hi' : ''}" style="left:${pct(mk[k]())}"><span>${k} · ${fmt(wkDate(mk[k]())).replace(/, \d{4}/, '')}</span></div>`).join('');
+  $('#gantt').innerHTML = `<div class="g-head"><div></div><div class="g-track">${ticks}</div></div>
+    <div class="g-body">${rows.map(n => {
+      const s = S[n.id];
+      const dim = state.team && !n.teams.includes(state.team);
+      return `<div class="g-row${dim ? ' dim' : ''}${state.sel === n.id ? ' sel' : ''}"><button class="g-lab" data-id="${n.id}" title="${n.name}"><span class="mono">${n.id}</span>${n.name}</button><div class="g-track"><button class="bar${s.crit ? ' crit' : ''}" data-id="${n.id}" style="left:${pct(s.es)};width:calc(${pct(s.ef - s.es)});--c:${TEAMS[n.teams[0]].c}" aria-label="${n.id} weeks ${wk(s.es)} to ${wk(s.ef)}">${wk(s.ef - s.es)}w</button></div></div>`;
+    }).join('')}<div class="lines">${marks}</div>`;
+}
+
+function renderAssets() {
+  $('#assets').innerHTML = ASSETS.map(a => `<div class="asset"><h3><span class="mono">${a.k}</span>${a.name}</h3><dl><dt>Owner</dt><dd>${a.owner}</dd><dt>Authors</dt><dd>${a.authors}</dd><dt>Sign-off</dt><dd>${a.sign}</dd><dt>Made in</dt><dd><button class="link" data-goto="${a.step}">${a.step}</button></dd></dl></div>`).join('');
+}
+
+function update() { schedule(); renderDates(); renderMap(); renderDetail(); renderGantt(); }
+function select(id) { state.sel = id; renderMap(); renderDetail(); renderGantt(); }
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-id],[data-goto],[data-team]');
+  if (!t) return;
+  if (t.dataset.team) { state.team = state.team === t.dataset.team ? null : t.dataset.team; renderTeams(); renderMap(); renderGantt(); return; }
+  select(t.dataset.id || t.dataset.goto);
+  if (t.dataset.goto) { const el = document.querySelector(`#map [data-id="${t.dataset.goto}"]`); if (el) el.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
+});
+$('#t0in').addEventListener('change', e => { if (e.target.value) { state.t0 = e.target.value; update(); } });
+$('#desOn').addEventListener('change', e => { state.des = e.target.checked; update(); });
+window.addEventListener('resize', drawEdges);
+if (window.ResizeObserver) new ResizeObserver(drawEdges).observe($('#map'));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawEdges);
+
+renderTeams(); renderAssets(); update();
+</script>
